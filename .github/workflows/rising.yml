@@ -1,4 +1,4 @@
-name: RisingOS Build
+name: BlackIron Build
 permissions: write-all
 on:
     workflow_dispatch:
@@ -6,10 +6,10 @@ on:
             device:
                 description: 'Device'
                 required: true
-                default: 'vayu'
+                default: 'kebab'
                 type: choice
                 options:
-                - vayu
+                - kebab
             cleanstrategy:
                 description: 'Select Clean strategy'
                 required: true
@@ -20,7 +20,7 @@ on:
                 - installclean
                 - clobber
 jobs:
-    riceDroid-Build:
+    BlakIron-Build:
       runs-on: self-hosted
       if: ${{ inputs.device }}
       steps:
@@ -35,20 +35,20 @@ jobs:
           run: | 
            cd ~/rising/
            if [[ $cleanstrategy == "installclean" ]]; then echo "Make install clean";  
-           source build/envsetup.sh; lunch lineage_${{ inputs.device }}-userdebug; make installclean;
+           source build/envsetup.sh; lunch aosp_${{ inputs.device }}-userdebug; make installclean;
            elif [[ $cleanstrategy == "clobber" ]];  then echo "Make clobber";
-           source build/envsetup.sh; lunch lineage_${{ inputs.device }}-userdebug; make clobber;
+           source build/envsetup.sh; lunch aosp_${{ inputs.device }}-userdebug; make clobber;
            elif [[ $cleanstrategy == "nope" ]];  then echo "DIRTY BUILD";
            fi
         - name: Run the build
           run: |
-            cd ~/rising/
+            cd ~/BlackIron/
             echo "Building for ${{ inputs.device }}"
 
             source build/envsetup.sh
-            lunch lineage_${{ inputs.device }}-userdebug
-            mka bacon -j$(nproc --all)
-            cp out/target/product/${{ inputs.device }}/rising*.zip* ${GITHUB_WORKSPACE}
+            lunch aosp_${{ inputs.device }}-userdebug
+            mka bacon -j8
+            cp out/target/product/${{ inputs.device }}/BlakIron*.zip* ${GITHUB_WORKSPACE}
         - uses: "marvinpinto/action-automatic-releases@latest"
           with:
             repo_token: "${{ secrets.GITHUB_TOKEN }}"
